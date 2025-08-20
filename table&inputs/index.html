@@ -30,7 +30,7 @@
             <th>first name</th>
             <th>last name</th>
             <th>nick name</th>
-            <th></th>
+            <th>delete</th>
           </tr>
         </thead>
         <tbody id="infotable" class="text-center"></tbody>
@@ -54,24 +54,65 @@
     const lastName = document.getElementById("input2");
     const nickName = document.getElementById("input3");
     const datatable = document.getElementById("infotable");
+    //show saved variable in loading page when open
+    window.onload = function () {
+      let saved = localStorage.getItem("mytable");
+      if (saved) {
+        let data = JSON.parse(saved);
+        data.forEach(function (person) {
+          datatable.innerHTML += `
+          <tr>
+            <td></td>
+            <td>${person.firstName}</td>
+            <td>${person.lastName}</td>
+            <td>${person.nickName}</td>
+            <td><button class = "btn btn-outline-danger" onclick="deletRow(this)">x</button></td>
+          </tr>`;
+        });
+        renumber();
+      }
+    };
 
     function add() {
-      if ((firstName.value, lastName.value, nickName.value === "")) {
+      if (!firstName.value || !lastName.value || !nickName.value) {
         alert("you should fill the inputs");
       } else {
-        datatable.innerHTML += ` 
+        datatable.innerHTML += `
         <tr>
             <td>${datatable.rows.length + 1}</td>
             <td>${firstName.value}</td>
             <td>${lastName.value}</td>
             <td>${nickName.value}</td>
-            <td></td>
+            <td><button class = "btn btn-outline-danger" onclick="deletRow(this)">x</button></td>
 
         </tr>`;
         firstName.value = "";
         lastName.value = "";
         nickName.value = "";
+        renumber();
+        save();
       }
+    }
+    function deletRow(button) {
+      button.closest("tr").remove();
+      renumber();
+      save();
+    }
+    function renumber() {
+      [...datatable.rows].forEach(
+        (row, i) => (row.cells[0].textContent = i + 1)
+      );
+    }
+    function save() {
+      let data = [];
+      [...datatable.rows].forEach(function (row) {
+        data.push({
+          firstName: row.cells[1].textContent,
+          lastName: row.cells[2].textContent,
+          nickName: row.cells[3].textContent,
+        });
+      });
+      localStorage.setItem("mytable", JSON.stringify(data));
     }
   </script>
 </html>
